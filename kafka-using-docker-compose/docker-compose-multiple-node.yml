@@ -1,0 +1,85 @@
+version: '3'
+
+services:
+    zookeeper-1:
+        image: confluentinc/cp-zookeeper:latest
+        container_name: zookeeper-1
+        ports:
+            - "2181:2181"
+        environment:
+            ZOOKEEPER_SERVER_ID: 1
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+            ZOOKEEPER_SYNC_LIMIT: 2
+            ZOOKEEPER_AUTOPURGE_PURGEINTERVAL: "true"
+            ZOOKEEPER_AUTOPURGE_SNAPRETAINCOUNT: "true"
+
+    zookeeper-2:
+        image: confluentinc/cp-zookeeper:latest
+        container_name: zookeeper-2
+        ports:
+            - "2182:2181"
+        environment:
+            ZOOKEEPER_SERVER_ID: 2
+            ZOOKEEPER_CLIENT_PORT: 2182
+            ZOOKEEPER_TICK_TIME: 2000
+            ZOOKEEPER_SYNC_LIMIT: 2
+            ZOOKEEPER_AUTOPURGE_PURGEINTERVAL: "true"
+            ZOOKEEPER_AUTOPURGE_SNAPRETAINCOUNT: "true"
+
+    broker-1:
+        image: confluentinc/cp-kafka:latest
+        container_name: broker-1
+        ports:
+            - "9091:9092"
+        depends_on:
+            - zookeeper-1
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181
+            KAFKA_NUM_PARTITIONS: 6
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+            KAFKA_LISTENERS: PLAINTEXT://broker-1:9091
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-1:9091
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+    broker-2:
+        image: confluentinc/cp-kafka:latest
+        container_name: broker-2
+        ports:
+            - "9092:9092"
+        depends_on:
+            - zookeeper-2
+        environment:
+            KAFKA_BROKER_ID: 2
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper-2:2182
+            KAFKA_NUM_PARTITIONS: 6
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+            KAFKA_LISTENERS: PLAINTEXT://broker-2:9092
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-2:9092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+    broker-3:
+        image: confluentinc/cp-kafka:latest
+        container_name: broker-3
+        ports:
+            - "9093:9092"
+        depends_on:
+            - zookeeper-2
+        environment:
+            KAFKA_BROKER_ID: 3
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper-2:2182
+            KAFKA_NUM_PARTITIONS: 6
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+            KAFKA_LISTENERS: PLAINTEXT://broker-3:9093
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-3:9093
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1

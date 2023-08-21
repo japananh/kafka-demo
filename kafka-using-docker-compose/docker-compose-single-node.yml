@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+    zookeeper:
+        image: confluentinc/cp-zookeeper:latest
+        container_name: zookeeper
+        ports:
+            - "2181:2181"
+        environment:
+            # For more information about full options, read 2 links below
+            # https://zookeeper.apache.org/doc/r3.4.10/zookeeperAdmin.html#sc_configuration
+            # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#zk-configuration
+
+            # ------------- Required options --------------------
+            # The unique server ID for the zookeeper, required when running in clustered mode
+            # it should have a value between 1 and 255
+            ZOOKEEPER_SERVER_ID: 1
+            # The port on which the ZooKeeper client connects
+            ZOOKEEPER_CLIENT_PORT: 2181
+            # The unit of time for ZooKeeper translated to milliseconds
+            ZOOKEEPER_TICK_TIME: 2000
+
+            # ------------- Optional configuration options -------------
+            # Amount of time, in ticks (see tickTime), to allow followers to sync with ZooKeeper.
+            # If followers fall too far behind a leader, they will be dropped.
+            ZOOKEEPER_SYNC_LIMIT: 2
+            # Automatic purging of old snapshots and transaction logs
+            ZOOKEEPER_AUTOPURGE_PURGEINTERVAL: "true"
+            ZOOKEEPER_AUTOPURGE_SNAPRETAINCOUNT: "true"
+
+    broker:
+        image: confluentinc/cp-kafka:latest
+        container_name: broker
+        ports:
+            - "9092:9092"
+        depends_on:
+            - zookeeper
+        environment:
+            # For more information on full configuration options read
+            # https://docs.confluent.io/platform/current/installation/configuration/broker-configs.html#cp-config-brokers
+
+            # The broker id for this server, default -1
+            KAFKA_BROKER_ID: 1
+            # If the value is true then it allows brokers to create topics when they’re first referenced by the producer or consumer.
+            # If the value is set to false, the topic should be first created using the Kafka command and then used.
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+            # Instructs Kafka how to contact Zookeeper
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            # Numbers of partitions in the broker
+            KAFKA_NUM_PARTITIONS: 3
+            # Key/value pairs for the security protocol to use per listener name
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+            # the network protocols, hosts, and ports that brokers use to listen for incoming connections
+            KAFKA_LISTENERS: PLAINTEXT://broker:9092
+            # Makes Kafka accessible from outside the container by advertising its location on the Docker host
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
+            # Is required when we are running with a single-node cluster.
+            # If you have three or more nodes, we can use the default.
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            # The minimum number of in-sync replicas (ISR) required for the transaction state log topic.
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            # The number of identical replicas of each partition's data
+            # that are stored on different brokers within the Kafka cluster.
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
