@@ -2,7 +2,7 @@
 
 ## Run Kafka with Confluent and Go
 
-Full tutorials (in Vietnamese) can be found on: https://200lab.io/blog/
+Full Vietnamese instruction can be found on: [Hướng dẫn sử dụng Kafka với Confluent và Go](https://200lab.io/blog/huong-dan-su-dung-kafka/).
 
 To run Kafka producer
 
