@@ -1,5 +1,3 @@
-version: '3'
-
 services:
     zookeeper:
         image: confluentinc/cp-zookeeper:latest
@@ -51,9 +49,9 @@ services:
             # Key/value pairs for the security protocol to use per listener name
             KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
             # the network protocols, hosts, and ports that brokers use to listen for incoming connections
-            KAFKA_LISTENERS: PLAINTEXT://broker:9092
+            KAFKA_LISTENERS: PLAINTEXT://broker:9092,CONTROLLER://broker:9093,PLAINTEXT_HOST://0.0.0.0:9092
             # Makes Kafka accessible from outside the container by advertising its location on the Docker host
-            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_HOST://localhost:9092
             # Is required when we are running with a single-node cluster.
             # If you have three or more nodes, we can use the default.
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
